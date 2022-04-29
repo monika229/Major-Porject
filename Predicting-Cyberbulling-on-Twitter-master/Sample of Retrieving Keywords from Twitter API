@@ -1,0 +1,117 @@
+
+# coding: utf-8
+
+# ## Group 3: Twitter API Dataset for Cyberbullying
+# 
+# We will use Python-Twitter library to grab tweets through Twitter API
+# **Phrases** gave us more context than the words alone, which initially gave us more noise.
+# 
+# Similar to Twython, Python-Twitter only takes one search at a time - so there are around 21 cells. However, the good thing is that there is no 15 min rate limit and you can look up usernames, tweets as many times as you want. It feels like a tedious process to search one-by-one, but was really the only way of getting the phrases and keywords we wanted.
+
+# In[1]:
+
+
+#Installing another twitter api library, python-twitter
+get_ipython().system('pip install python-twitter')
+
+
+# In[2]:
+
+
+#Importing packages and libraries
+import twitter
+import re
+import string
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import sent_tokenize
+
+
+# In[3]:
+
+
+#Putting credentials 
+api = twitter.Api(consumer_key="NRStTXhC2HqBvSv55XXO9sxm5",
+  consumer_secret="H1jky2hVkgBSzQOVMo0IdmAepZ0wnAldJVGm3QWjjqTQTY8hkf",
+  access_token_key="955970115576717312-IUAuXEeKIuVxTz9rNm561443N5Gm9sw",
+  access_token_secret="SCf7PPj3tgFpgXb47nzHlRNRpgH8kEs1i2prLZPkZBExQ")
+
+
+# In[4]:
+
+
+#Verifying credentials 
+print(api.VerifyCredentials())
+
+
+# In[5]:
+
+
+#Attempting to strip as much emojis as possible by pattern
+import re
+
+emoji_pattern = re.compile("["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"
+                           \U0001f914  # flags (iOS)
+                           "]+", flags=re.UNICODE)
+print(emoji_pattern)
+
+#In[56]:
+#"curse word" example: 
+
+
+search = api.GetSearch("f*#$ you", count=50)
+for t in search:
+    tweets = t.text.lower()
+    tweets = re.sub(r"http\S+", "", tweets)
+    tweets = tweets.replace("…","")
+    tweets = tweets.strip()
+    sentences = sent_tokenize(tweets.replace('\n',' '))
+    clean_words = [word for word in sentences if word not in set(string.punctuation)]
+    characters_to_remove = ["''",'``','...']
+    clean_words = [word for word in clean_words if word not in set(characters_to_remove)]
+    characters_to_remove2 = [word for word in clean_words if any(letter in sentences for letter in '\\')]
+    clean_words = [word for word in clean_words if word not in set(characters_to_remove2)]
+    print(clean_words)
+
+#In[63]:
+#"sexuality" example: 
+
+
+search = api.GetSearch("you are a p*#$", count=50)
+for t in search:
+    tweets = t.text.lower()
+    tweets = re.sub(r"http\S+", "", tweets)
+    tweets = tweets.replace("…","")
+    tweets = tweets.strip()
+    sentences = sent_tokenize(tweets.replace('\n',' '))
+    clean_words = [word for word in sentences if word not in set(string.punctuation)]
+    characters_to_remove = ["''",'``','...']
+    clean_words = [word for word in clean_words if word not in set(characters_to_remove)]
+    characters_to_remove2 = [word for word in clean_words if any(letter in sentences for letter in '\\')]
+    clean_words = [word for word in clean_words if word not in set(characters_to_remove2)]
+    print(clean_words)
+
+
+# In[76]:
+# sample "mean word/phrase" example: 
+
+
+search = api.GetSearch("nobody cares about you", count=50) # Replace happy with your search
+for t in search:
+    tweets = t.text.lower()
+    tweets = re.sub(r"http\S+", "", tweets)
+    tweets = tweets.replace("…","")
+    tweets = tweets.strip()
+    sentences = sent_tokenize(tweets.replace('\n',' '))
+    clean_words = [word for word in sentences if word not in set(string.punctuation)]
+    characters_to_remove = ["''",'``','...']
+    clean_words = [word for word in clean_words if word not in set(characters_to_remove)]
+    characters_to_remove2 = [word for word in clean_words if any(letter in sentences for letter in '\\')]
+    clean_words = [word for word in clean_words if word not in set(characters_to_remove2)]
+
+    print(clean_words)
